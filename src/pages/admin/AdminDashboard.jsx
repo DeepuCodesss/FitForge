@@ -8,14 +8,33 @@ export default function AdminDashboard() {
   const [members, setMembers] = useState([]);
   const [db, setDB] = useState({ fees: [], attendance: [] });
   const [loading, setLoading] = useState(true);
+  const safeMembers = Array.isArray(members) ? members : [];
+  const safeFees = Array.isArray(db?.fees) ? db.fees : [];
+  const safeAttendance = Array.isArray(db?.attendance) ? db.attendance : [];
 
   useEffect(() => {
     let alive = true;
     (async () => {
       const [loadedMembers, loadedDB] = await Promise.all([listMembers(), getDB()]);
       if (!alive) return;
-      setMembers(Array.isArray(loadedMembers) ? loadedMembers : []);
-      setDB(loadedDB && typeof loadedDB === "object" ? loadedDB : { fees: [], attendance: [] });
+      const nextMembers = Array.isArray(loadedMembers)
+        ? loadedMembers
+        : Array.isArray(loadedMembers?.members)
+          ? loadedMembers.members
+          : [];
+      const nextDB = loadedDB && typeof loadedDB === "object" && !Array.isArray(loadedDB)
+        ? {
+            fees: Array.isArray(loadedDB.fees) ? loadedDB.fees : [],
+            attendance: Array.isArray(loadedDB.attendance) ? loadedDB.attendance : [],
+          }
+        : { fees: [], attendance: [] };
+      setMembers(nextMembers);
+      setDB(nextDB);
+      setLoading(false);
+    })().catch(() => {
+      if (!alive) return;
+      setMembers([]);
+      setDB({ fees: [], attendance: [] });
       setLoading(false);
     })();
     return () => {
@@ -33,15 +52,15 @@ export default function AdminDashboard() {
   }
 
   const active = members.filter((m) => m.status === "active").length;
-  const revenue = db.fees.filter((f) => f.status === "paid").reduce((s, f) => s + f.amount, 0);
-  const presentToday = db.attendance.filter((a) => a.date === todayISO() && a.status === "present").length;
+  const revenue = safeFees.filter((f) => f.status === "paid").reduce((s, f) => s + Number(f.amount || 0), 0);
+  const presentToday = safeAttendance.filter((a) => a.date === todayISO() && a.status === "present").length;
 
   return (
     <div>
       <PageHeader title="Overview" subtitle="Gym-wide snapshot" />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        <StatCard label="Total Members" value={members.length} icon={<Users size={16} />} />
+        <StatCard label="Total Members" value={safeMembers.length} icon={<Users size={16} />} />
         <StatCard label="Active" value={active} icon={<Activity size={16} />} />
         <StatCard label="Revenue Collected" value={`$${revenue}`} icon={<CreditCard size={16} color="#fff" />} iconBg="var(--color-accent)" />
         <StatCard label="Present Today" value={presentToday} icon={<CalendarCheck size={16} />} />
@@ -55,7 +74,7 @@ export default function AdminDashboard() {
           </Link>
         </div>
         <div className="flex flex-col">
-          {members.slice(0, 6).map((m) => (
+          {safeMembers.slice(0, 6).map((m) => (
             <Link
               key={m.id}
               to={`/admin/members/${m.id}`}
