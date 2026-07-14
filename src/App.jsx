@@ -26,13 +26,15 @@ import AdminMemberDetail from "./pages/admin/AdminMemberDetail";
 import AdminFeedback from "./pages/admin/AdminFeedback";
 
 function RequireMember({ children }) {
-  const { session } = useAuth();
+  const { session, loading } = useAuth();
+  if (loading) return null;
   if (!session || session.role !== "member") return <Navigate to="/login" replace />;
   return children;
 }
 
 function RequireAdmin({ children }) {
-  const { session } = useAuth();
+  const { session, loading } = useAuth();
+  if (loading) return null;
   if (!session || session.role !== "admin") return <Navigate to="/admin/login" replace />;
   return children;
 }

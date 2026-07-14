@@ -14,12 +14,9 @@ export default function MemberSignup() {
 
   const submit = (e) => {
     e.preventDefault();
-    const res = memberSignup(form);
-    if (res.ok) {
-      navigate("/portal");
-    } else {
-      setError(res.error);
-    }
+    Promise.resolve(memberSignup(form))
+      .then((res) => { if (res.ok) navigate("/portal"); else setError(res.error); })
+      .catch((err) => setError(err.message));
   };
 
   return (

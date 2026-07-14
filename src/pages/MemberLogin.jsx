@@ -13,12 +13,12 @@ export default function MemberLogin() {
 
   const submit = (e) => {
     e.preventDefault();
-    const res = memberLogin(email, password);
-    if (res.ok) {
-      navigate("/portal");
-    } else {
-      setError(res.error);
-    }
+    Promise.resolve(memberLogin(email, password))
+      .then((res) => {
+        if (res.ok) navigate("/portal");
+        else setError(res.error);
+      })
+      .catch((err) => setError(err.message));
   };
 
   return (

@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password_hash String
+  name          String
+  createdAt     DateTime @default(now())
+}
+
+model Member {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password_hash     String
+  phone             String?
+  address           String?
+  goal              String?
+  height            String?
+  currentWeight     String?
+  targetWeight      String?
+  bodyFat           String?
+  membershipExpiry  String?
+  plan              String   @default("Basic")
+  status            String   @default("active")
+  createdAt         DateTime @default(now())
+  attendance       Attendance[]
+  fees             Fee[]
+  progressEntries  ProgressEntry[]
+  notifications    Notification[]
+  feedback         Feedback[]
+  workoutPlan      WorkoutPlan?
+  dietPlan         DietPlan?
+}
+
+model Attendance {
+  id       String   @id @default(cuid())
+  memberId String
+  date     String
+  status   String
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model Fee {
+  id       String   @id @default(cuid())
+  memberId String
+  amount   Float
+  due      String
+  status   String
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model WorkoutPlan {
+  memberId String  @id
+  title    String
+  days     Json
+  member   Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model DietPlan {
+  memberId String  @id
+  title    String
+  meals    Json
+  member   Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model ProgressEntry {
+  id       String   @id @default(cuid())
+  memberId String
+  date     String
+  weight   Float
+  bodyFat  Float?
+  note     String?
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id       String   @id @default(cuid())
+  memberId String
+  title    String
+  message  String
+  date     String
+  read     Boolean  @default(false)
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id       String   @id @default(cuid())
+  memberId String
+  message  String
+  date     String
+  response String?
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}

@@ -13,12 +13,9 @@ export default function AdminLogin() {
 
   const submit = (e) => {
     e.preventDefault();
-    const res = adminLogin(email, password);
-    if (res.ok) {
-      navigate("/admin");
-    } else {
-      setError(res.error);
-    }
+    Promise.resolve(adminLogin(email, password))
+      .then((res) => { if (res.ok) navigate("/admin"); else setError(res.error); })
+      .catch((err) => setError(err.message));
   };
 
   return (
