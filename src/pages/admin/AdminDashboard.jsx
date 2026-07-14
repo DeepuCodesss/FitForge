@@ -1,11 +1,26 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Users, Activity, CreditCard, CalendarCheck } from "lucide-react";
 import { PageHeader, Panel, StatCard, Badge } from "../../components/UI";
 import { listMembers, getDB, todayISO } from "../../lib/store";
 
 export default function AdminDashboard() {
-  const members = listMembers();
-  const db = getDB();
+  const [members, setMembers] = useState([]);
+  const [db, setDB] = useState({ fees: [], attendance: [] });
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const [loadedMembers, loadedDB] = await Promise.all([listMembers(), getDB()]);
+      if (!alive) return;
+      setMembers(loadedMembers);
+      setDB(loadedDB);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const active = members.filter((m) => m.status === "active").length;
   const revenue = db.fees.filter((f) => f.status === "paid").reduce((s, f) => s + f.amount, 0);
   const presentToday = db.attendance.filter((a) => a.date === todayISO() && a.status === "present").length;

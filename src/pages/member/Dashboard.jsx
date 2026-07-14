@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Scale, Target, Calendar, Activity } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Panel, StatCard } from "../../components/UI";
@@ -5,11 +6,31 @@ import { attendanceThisMonth, feeSummary, getNotifications } from "../../lib/sto
 
 export default function Dashboard() {
   const { member } = useAuth();
-  if (!member) return null;
+  const [summary, setSummary] = useState({ daysThisMonth: 0, pending: 0, notifications: [] });
 
-  const daysThisMonth = attendanceThisMonth(member.id);
-  const { pending } = feeSummary(member.id);
-  const notifications = getNotifications(member.id).slice(0, 3);
+  useEffect(() => {
+    let alive = true;
+    if (!member) return;
+    (async () => {
+      const [daysThisMonth, fees, notifications] = await Promise.all([
+        attendanceThisMonth(member.id),
+        feeSummary(member.id),
+        getNotifications(member.id),
+      ]);
+      if (!alive) return;
+      setSummary({
+        daysThisMonth,
+        pending: fees.pending,
+        notifications: notifications.slice(0, 3),
+      });
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member]);
+
+  if (!member) return null;
+  const { daysThisMonth, pending, notifications } = summary;
 
   const current = Number(member.currentWeight) || 0;
   const target = Number(member.targetWeight) || 0;
