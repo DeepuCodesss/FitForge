@@ -25,7 +25,9 @@
 
 - The static site must be built with `VITE_API_URL` set. If this is missing,
   the frontend falls back to `http://localhost:3001` in development only.
-- `CORS_ORIGIN` must match the static site URL exactly, including `https://`.
+- `CORS_ORIGIN` should match the static site URL. The backend now trims a
+  trailing slash, so either `https://example.onrender.com` or
+  `https://example.onrender.com/` will work.
 - The backend and frontend are separate Render services, so they do not connect
   automatically just because both are live.
 

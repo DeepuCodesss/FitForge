@@ -11,7 +11,19 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") || true, credentials: true }));
+
+function normalizeOrigin(origin) {
+  return origin?.trim().replace(/\/$/, "");
+}
+
+const allowedOrigins = process.env.CORS_ORIGIN?.split(",").map(normalizeOrigin).filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins?.length ? allowedOrigins : true,
+    credentials: true,
+  })
+);
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 const cookieOptions = { httpOnly: true, sameSite: "none", secure: true, path: "/" };
