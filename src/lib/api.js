@@ -5,6 +5,7 @@ const API_URL_RAW =
 export const API_URL = API_URL_RAW.replace(/\/$/, "");
 
 async function request(path, options = {}) {
+  if (!API_URL) throw new Error("Missing API URL");
   const res = await fetch(`${API_URL}${path}`, {
     credentials: "include",
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -17,6 +18,7 @@ async function request(path, options = {}) {
 }
 
 export async function healthCheck() {
+  if (!API_URL) throw new Error("Missing API URL");
   const res = await fetch(`${API_URL}/api/health`, {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -74,3 +76,7 @@ export async function getFeedback(memberId) { return request(`/api/members/${mem
 export async function allFeedback() { return request("/api/admin/feedback"); }
 export async function addFeedback(memberId, message) { return request(`/api/members/${memberId}/feedback`, { method: "POST", body: JSON.stringify({ message }) }); }
 export async function respondFeedback(feedbackId, response) { return request(`/api/feedback/${feedbackId}/respond`, { method: "PATCH", body: JSON.stringify({ response }) }); }
+
+export function getApiBaseUrl() {
+  return API_URL;
+}

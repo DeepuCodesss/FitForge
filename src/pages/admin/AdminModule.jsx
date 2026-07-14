@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PageHeader, Panel, StatCard, Badge } from "../../components/UI";
 import { Skeleton } from "../../components/Skeleton";
+import { getApiBaseUrl } from "../../lib/api";
 
-const API_URL =
-  (import.meta.env.VITE_API_URL || "http://localhost:3001").replace(/\/$/, "");
+const API_URL = (getApiBaseUrl() || "http://localhost:3001").replace(/\/$/, "");
 
 const CHARTS = [
   "Member Growth",
@@ -33,8 +33,10 @@ export default function AdminModule() {
         const res = await fetch(`${API_URL}/api/admin/modules/${section}`, {
           credentials: "include",
         });
-        const json = await res.json();
+        const text = await res.text();
+        const json = text ? JSON.parse(text) : null;
         if (!alive) return;
+        if (!res.ok) throw new Error(json?.error || "Request failed");
         setData({
           title: json?.title || "Admin Module",
           description: json?.description || "Live workspace for gym operations.",

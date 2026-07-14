@@ -26,7 +26,13 @@ app.use(
 );
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
-const cookieOptions = { httpOnly: true, sameSite: "none", secure: true, path: "/" };
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: isProduction ? "none" : "lax",
+  secure: isProduction,
+  path: "/",
+};
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 function signSession(payload) {

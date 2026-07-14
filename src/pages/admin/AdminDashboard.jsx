@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { PageHeader, Panel, StatCard, Badge } from "../../components/UI";
 import { Skeleton } from "../../components/Skeleton";
-import { listMembers, getDB, todayISO } from "../../lib/store";
+import { listMembers, getFees, getAttendance, getFeedback, getProgress, todayISO } from "../../lib/store";
 
 const bars = [58, 72, 62, 84, 68, 90, 76, 86];
 
@@ -49,7 +49,7 @@ function MiniChart({ title, values }) {
 
 export default function AdminDashboard() {
   const [members, setMembers] = useState([]);
-  const [db, setDB] = useState({ fees: [], attendance: [] });
+  const [db, setDB] = useState({ fees: [], attendance: [], feedback: [], progress: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
 
     const load = async () => {
       try {
-        const [loadedMembers, loadedDB] = await Promise.all([listMembers(), getDB()]);
+        const loadedMembers = await listMembers();
         if (!alive) return;
         const nextMembers = Array.isArray(loadedMembers)
           ? loadedMembers
@@ -66,9 +66,23 @@ export default function AdminDashboard() {
             ? loadedMembers.members
             : [];
         setMembers(nextMembers);
+        const fetched = await Promise.all(
+          nextMembers.slice(0, 12).map(async (m) => {
+            const [fees, attendance, feedback, progress] = await Promise.all([
+              getFees(m.id).catch(() => []),
+              getAttendance(m.id).catch(() => []),
+              getFeedback(m.id).catch(() => []),
+              getProgress(m.id).catch(() => []),
+            ]);
+            return { fees, attendance, feedback, progress };
+          })
+        );
+        if (!alive) return;
         setDB({
-          fees: Array.isArray(loadedDB?.fees) ? loadedDB.fees : [],
-          attendance: Array.isArray(loadedDB?.attendance) ? loadedDB.attendance : [],
+          fees: fetched.flatMap((item) => item.fees || []),
+          attendance: fetched.flatMap((item) => item.attendance || []),
+          feedback: fetched.flatMap((item) => item.feedback || []),
+          progress: fetched.flatMap((item) => item.progress || []),
         });
       } finally {
         if (alive) setLoading(false);
@@ -87,6 +101,8 @@ export default function AdminDashboard() {
   const safeMembers = Array.isArray(members) ? members : [];
   const safeFees = Array.isArray(db?.fees) ? db.fees : [];
   const safeAttendance = Array.isArray(db?.attendance) ? db.attendance : [];
+  const safeFeedback = Array.isArray(db?.feedback) ? db.feedback : [];
+  const safeProgress = Array.isArray(db?.progress) ? db.progress : [];
 
   const summary = useMemo(() => {
     const activeMembers = safeMembers.filter((m) => m.status === "active").length;
@@ -101,9 +117,10 @@ export default function AdminDashboard() {
     const paidFees = safeFees.filter((f) => f.status === "paid").reduce((s, f) => s + Number(f.amount || 0), 0);
     const expiredMemberships = safeMembers.filter((m) => m.membershipExpiry && m.membershipExpiry < today).length;
     const newMembers = safeMembers.filter((m) => m.createdAt?.startsWith(thisMonth)).length;
-    const feedbackCount = safeMembers.reduce((s, m) => s + (Array.isArray(m.feedback) ? m.feedback.length : 0), 0);
+    const feedbackCount = safeFeedback.length;
     const workoutCompletionRate = Math.min(100, Math.max(18, 52 + activeMembers * 2));
-    const onlineMembers = Math.min(activeMembers, Math.max(1, Math.round(activeMembers * 0.4)));
+    const onlineMembers = Math.min(activeMembers, Math.max(0, Math.round(activeMembers * 0.4)));
+    const progressCount = safeProgress.length;
 
     return {
       activeMembers,
@@ -119,8 +136,9 @@ export default function AdminDashboard() {
       feedbackCount,
       workoutCompletionRate,
       onlineMembers,
+      progressCount,
     };
-  }, [safeAttendance, safeFees, safeMembers]);
+  }, [safeAttendance, safeFees, safeFeedback, safeMembers, safeProgress]);
 
   const memberTrend = useMemo(() => [34, 42, 48, 57, 66, 72, 79], []);
   const revenueTrend = useMemo(() => [46, 54, 63, 58, 71, 82, 90], []);
