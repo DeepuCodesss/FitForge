@@ -26,7 +26,7 @@ export default function MemberSignup() {
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--color-accent)" }}>
             <Dumbbell size={18} color="#fff" />
           </div>
-          <span className="text-xl font-extrabold tracking-tight">FitForge</span>
+          <span className="text-xl font-extrabold tracking-tight">SRW FITZONE</span>
         </Link>
 
         <div className="rounded-2xl border p-8" style={{ background: "var(--color-panel)", borderColor: "var(--color-border)" }}>

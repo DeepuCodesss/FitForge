@@ -30,7 +30,7 @@ export default function AdminLayout() {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--color-accent)" }}>
               <Dumbbell size={18} color="#fff" />
             </div>
-            <span className="text-xl font-extrabold tracking-tight">FitForge</span>
+            <span className="text-xl font-extrabold tracking-tight">SRW FITZONE</span>
           </div>
 
           <nav className="flex flex-col gap-1.5">

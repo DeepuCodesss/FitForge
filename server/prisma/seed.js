@@ -5,7 +5,9 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminHash = await bcrypt.hash("admin123", 10);
+  const adminEmail = "Vannu123sh78@gmail.com";
+  const adminPassword = "2e606836";
+  const adminHash = await bcrypt.hash(adminPassword, 10);
   const memberHash = await bcrypt.hash("demo1234", 10);
   const member = await prisma.member.upsert({
     where: { email: "deeepak@gmail.com" },
@@ -21,9 +23,9 @@ async function main() {
     },
   });
   await prisma.admin.upsert({
-    where: { email: "admin@fitforge.com" },
-    update: {},
-    create: { email: "admin@fitforge.com", name: "Admin", password_hash: adminHash },
+    where: { email: adminEmail },
+    update: { password_hash: adminHash, name: "Admin" },
+    create: { email: adminEmail, name: "Admin", password_hash: adminHash },
   });
   await prisma.attendance.upsert({
     where: { id: "seed-attendance" },

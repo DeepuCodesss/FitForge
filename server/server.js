@@ -188,14 +188,27 @@ app.patch("/api/feedback/:id/respond", auth, requireAdmin, async (req, res) => {
 });
 
 async function ensureSeedData() {
+  const adminEmail = "Vannu123sh78@gmail.com";
+  const adminPassword = "2e606836";
+  const adminHash = await bcrypt.hash(adminPassword, 10);
   const adminCount = await prisma.admin.count();
   const memberCount = await prisma.member.count();
   if (adminCount === 0) {
     await prisma.admin.create({
       data: {
-        email: "admin@fitforge.com",
+        email: adminEmail,
         name: "Admin",
-        password_hash: await bcrypt.hash("admin123", 10),
+        password_hash: adminHash,
+      },
+    });
+  } else {
+    await prisma.admin.upsert({
+      where: { email: adminEmail },
+      update: { password_hash: adminHash, name: "Admin" },
+      create: {
+        email: adminEmail,
+        name: "Admin",
+        password_hash: adminHash,
       },
     });
   }
@@ -216,7 +229,7 @@ async function ensureSeedData() {
     await prisma.notification.create({
       data: {
         memberId: member.id,
-        title: "Welcome to FitForge",
+        title: "Welcome to SRW FITZONE",
         message: "Your account has been created. Complete your profile to get personalized plans.",
         date: todayISO(),
         read: false,

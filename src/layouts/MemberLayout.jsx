@@ -55,7 +55,7 @@ export default function MemberLayout() {
             >
               <Dumbbell size={18} color="#fff" />
             </div>
-            <span className="text-xl font-extrabold tracking-tight">FitForge</span>
+            <span className="text-xl font-extrabold tracking-tight">SRW FITZONE</span>
           </div>
 
           <nav className="flex flex-col gap-1.5">

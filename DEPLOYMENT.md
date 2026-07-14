@@ -6,7 +6,7 @@
 3. Set environment variables on the Web Service:
    - `DATABASE_URL` from Neon or Supabase
    - `JWT_SECRET` to a long random string
-   - `CORS_ORIGIN` to the Render static site URL, for example `https://fitforge-web.onrender.com`
+   - `CORS_ORIGIN` to the Render static site URL, for example `https://srw-fitzone.onrender.com`
    - `PORT` to `3001` or leave Render default
 4. Build command:
    - `npm install && npx prisma generate && npx prisma db push`

@@ -8,8 +8,8 @@ import { healthCheck } from "../lib/api";
 export default function AdminLogin() {
   const { adminLogin } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@fitforge.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("Vannu123sh78@gmail.com");
+  const [password, setPassword] = useState("2e606836");
   const [error, setError] = useState("");
   const [health, setHealth] = useState("checking");
 
@@ -37,7 +37,7 @@ export default function AdminLogin() {
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--color-accent)" }}>
             <Dumbbell size={18} color="#fff" />
           </div>
-          <span className="text-xl font-extrabold tracking-tight">FitForge</span>
+          <span className="text-xl font-extrabold tracking-tight">SRW FITZONE</span>
         </Link>
 
         <div className="rounded-2xl border p-8" style={{ background: "var(--color-panel)", borderColor: "var(--color-border)" }}>

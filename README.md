@@ -1,4 +1,4 @@
-# FitForge - Gym Management System
+# SRW FITZONE - Gym Management System
 
 A gym management web app with a marketing landing page, a member portal, and
 an admin portal built with React, React Router, Tailwind CSS, Express, Prisma,
@@ -20,8 +20,8 @@ The current version uses a real backend API with cookie-based auth. That means:
 - Password: `demo1234`
 
 **Admin portal** - `/admin/login`
-- Email: `admin@fitforge.com`
-- Password: `admin123`
+- Email: `Vannu123sh78@gmail.com`
+- Password: `2e606836`
 
 ## Running it locally
 

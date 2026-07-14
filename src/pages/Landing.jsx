@@ -32,7 +32,7 @@ export default function Landing() {
           >
             <Dumbbell size={18} color="#fff" />
           </div>
-          <span className="text-xl font-extrabold tracking-tight">FitForge</span>
+          <span className="text-xl font-extrabold tracking-tight">SRW FITZONE</span>
         </div>
         <nav className="flex items-center gap-3">
           <Link to="/login" className="text-[15px] font-medium hover:opacity-80 px-2">
