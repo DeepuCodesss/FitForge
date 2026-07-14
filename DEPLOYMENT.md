@@ -19,7 +19,11 @@
    - `npm install && npm run build`
 9. Publish directory:
    - `dist`
-10. On first deploy, run the seed command in the server service:
+10. Add a rewrite rule on the static site:
+    - `source: /*`
+    - `destination: /index.html`
+    - This is required for React Router routes like `/portal` and `/admin`.
+11. On first deploy, run the seed command in the server service:
    - `npx prisma db seed`
 
 ### Important
