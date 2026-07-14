@@ -1,6 +1,6 @@
 const API_URL_RAW =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:3001" : "");
+  (import.meta.env.DEV ? "http://localhost:3001" : "https://fitforge-api.onrender.com");
 
 export const API_URL = API_URL_RAW.replace(/\/$/, "");
 
