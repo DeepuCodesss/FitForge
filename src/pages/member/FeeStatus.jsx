@@ -1,12 +1,30 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageHeader, Panel, Badge, EmptyState } from "../../components/UI";
 import { getFees, feeSummary } from "../../lib/store";
 
 export default function FeeStatus() {
   const { member } = useAuth();
+  const [fees, setFees] = useState([]);
+  const [summary, setSummary] = useState({ pending: 0, paid: 0 });
   if (!member) return null;
-  const fees = getFees(member.id);
-  const { pending, paid } = feeSummary(member.id);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const [loadedFees, loadedSummary] = await Promise.all([
+        getFees(member.id),
+        feeSummary(member.id),
+      ]);
+      if (!alive) return;
+      setFees(Array.isArray(loadedFees) ? loadedFees : []);
+      setSummary(loadedSummary || { pending: 0, paid: 0 });
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member.id]);
+  const { pending, paid } = summary;
 
   return (
     <div>

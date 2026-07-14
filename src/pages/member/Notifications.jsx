@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageHeader, Panel, EmptyState } from "../../components/UI";
 import { getNotifications, markNotificationRead } from "../../lib/store";
@@ -6,8 +6,19 @@ import { getNotifications, markNotificationRead } from "../../lib/store";
 export default function Notifications() {
   const { member } = useAuth();
   const [, setTick] = useState(0);
+  const [notifications, setNotifications] = useState([]);
   if (!member) return null;
-  const notifications = getNotifications(member.id);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const data = await getNotifications(member.id);
+      if (alive) setNotifications(Array.isArray(data) ? data : []);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member.id]);
 
   const read = (id) => {
     markNotificationRead(member.id, id);

@@ -1,11 +1,23 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageHeader, Panel, EmptyState } from "../../components/UI";
 import { getWorkoutPlan } from "../../lib/store";
 
 export default function WorkoutPlan() {
   const { member } = useAuth();
+  const [plan, setPlan] = useState(null);
   if (!member) return null;
-  const plan = getWorkoutPlan(member.id);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const data = await getWorkoutPlan(member.id);
+      if (alive) setPlan(data || null);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member.id]);
 
   return (
     <div>

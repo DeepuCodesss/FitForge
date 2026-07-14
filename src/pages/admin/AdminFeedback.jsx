@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PageHeader, Panel, EmptyState, Textarea, Button } from "../../components/UI";
 import { allFeedback, respondFeedback, getMember } from "../../lib/store";
@@ -6,7 +6,18 @@ import { allFeedback, respondFeedback, getMember } from "../../lib/store";
 export default function AdminFeedback() {
   const [, setTick] = useState(0);
   const [drafts, setDrafts] = useState({});
-  const items = allFeedback();
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const data = await allFeedback();
+      if (alive) setItems(Array.isArray(data) ? data : []);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const respond = (id) => {
     const text = drafts[id];

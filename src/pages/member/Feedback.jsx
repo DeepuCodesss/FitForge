@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageHeader, Panel, EmptyState, Button, Textarea } from "../../components/UI";
 import { getFeedback, addFeedback } from "../../lib/store";
@@ -7,9 +7,20 @@ export default function Feedback() {
   const { member } = useAuth();
   const [, setTick] = useState(0);
   const [message, setMessage] = useState("");
+  const [items, setItems] = useState([]);
 
   if (!member) return null;
-  const items = getFeedback(member.id);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const data = await getFeedback(member.id);
+      if (alive) setItems(Array.isArray(data) ? data : []);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member.id]);
 
   const submit = (e) => {
     e.preventDefault();

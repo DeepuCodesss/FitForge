@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageHeader, Panel, Badge, Button, EmptyState } from "../../components/UI";
 import { getAttendance, markAttendance, attendanceThisMonth, todayISO } from "../../lib/store";
@@ -6,10 +6,26 @@ import { getAttendance, markAttendance, attendanceThisMonth, todayISO } from "..
 export default function Attendance() {
   const { member } = useAuth();
   const [, setTick] = useState(0);
+  const [records, setRecords] = useState([]);
+  const [days, setDays] = useState(0);
   if (!member) return null;
 
-  const records = getAttendance(member.id);
-  const days = attendanceThisMonth(member.id);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const [loadedRecords, loadedDays] = await Promise.all([
+        getAttendance(member.id),
+        attendanceThisMonth(member.id),
+      ]);
+      if (!alive) return;
+      setRecords(Array.isArray(loadedRecords) ? loadedRecords : []);
+      setDays(Number(loadedDays) || 0);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member.id, setTick]);
+
   const markedToday = records.some((r) => r.date === todayISO());
 
   const checkIn = () => {

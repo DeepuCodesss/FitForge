@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pencil, Check, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Panel, PageHeader, Badge, Input, Button } from "../../components/UI";
@@ -28,6 +28,10 @@ export default function Profile() {
   const { member, refreshMember } = useAuth();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(member || {});
+
+  useEffect(() => {
+    setForm(member || {});
+  }, [member]);
 
   if (!member) return null;
 
