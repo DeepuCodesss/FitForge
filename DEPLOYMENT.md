@@ -10,6 +10,7 @@
    - `PORT` to `3001` or leave Render default
 4. Build command:
    - `npm install && npx prisma generate && npx prisma db push`
+   - Do not use `prisma migrate deploy` unless you have actual migration files.
 5. Start command:
    - `node server.js`
 6. Create a Static Site for the frontend.
@@ -30,6 +31,8 @@
   `https://example.onrender.com/` will work.
 - The backend and frontend are separate Render services, so they do not connect
   automatically just because both are live.
+- If the backend log says `The table public.Admin does not exist`, the schema
+  has not been pushed to the database yet.
 
 ### Neon setup
 
