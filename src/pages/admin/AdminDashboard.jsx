@@ -15,27 +15,29 @@ export default function AdminDashboard() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [loadedMembers, loadedDB] = await Promise.all([listMembers(), getDB()]);
-      if (!alive) return;
-      const nextMembers = Array.isArray(loadedMembers)
-        ? loadedMembers
-        : Array.isArray(loadedMembers?.members)
-          ? loadedMembers.members
-          : [];
-      const nextDB = loadedDB && typeof loadedDB === "object" && !Array.isArray(loadedDB)
-        ? {
-            fees: Array.isArray(loadedDB.fees) ? loadedDB.fees : [],
-            attendance: Array.isArray(loadedDB.attendance) ? loadedDB.attendance : [],
-          }
-        : { fees: [], attendance: [] };
-      setMembers(nextMembers);
-      setDB(nextDB);
-      setLoading(false);
-    })().catch(() => {
-      if (!alive) return;
-      setMembers([]);
-      setDB({ fees: [], attendance: [] });
-      setLoading(false);
+      try {
+        const [loadedMembers, loadedDB] = await Promise.all([listMembers(), getDB()]);
+        if (!alive) return;
+        const nextMembers = Array.isArray(loadedMembers)
+          ? loadedMembers
+          : Array.isArray(loadedMembers?.members)
+            ? loadedMembers.members
+            : [];
+        const nextDB = loadedDB && typeof loadedDB === "object" && !Array.isArray(loadedDB)
+          ? {
+              fees: Array.isArray(loadedDB.fees) ? loadedDB.fees : [],
+              attendance: Array.isArray(loadedDB.attendance) ? loadedDB.attendance : [],
+            }
+          : { fees: [], attendance: [] };
+        setMembers(nextMembers);
+        setDB(nextDB);
+      } catch {
+        if (!alive) return;
+        setMembers([]);
+        setDB({ fees: [], attendance: [] });
+      } finally {
+        if (alive) setLoading(false);
+      }
     })();
     return () => {
       alive = false;
