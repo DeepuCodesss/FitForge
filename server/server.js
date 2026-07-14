@@ -175,4 +175,48 @@ app.patch("/api/feedback/:id/respond", auth, requireAdmin, async (req, res) => {
   res.json(item);
 });
 
-app.listen(process.env.PORT || 3001);
+async function ensureSeedData() {
+  const adminCount = await prisma.admin.count();
+  const memberCount = await prisma.member.count();
+  if (adminCount === 0) {
+    await prisma.admin.create({
+      data: {
+        email: "admin@fitforge.com",
+        name: "Admin",
+        password_hash: await bcrypt.hash("admin123", 10),
+      },
+    });
+  }
+  if (memberCount === 0) {
+    const member = await prisma.member.create({
+      data: {
+        name: "Deepak Kumar",
+        email: "deeepak@gmail.com",
+        password_hash: await bcrypt.hash("demo1234", 10),
+        phone: "09350432714",
+        plan: "Basic",
+        status: "active",
+      },
+    });
+    await prisma.attendance.create({
+      data: { memberId: member.id, date: todayISO(), status: "present" },
+    });
+    await prisma.notification.create({
+      data: {
+        memberId: member.id,
+        title: "Welcome to FitForge",
+        message: "Your account has been created. Complete your profile to get personalized plans.",
+        date: todayISO(),
+        read: false,
+      },
+    });
+  }
+}
+
+const port = process.env.PORT || 3001;
+ensureSeedData()
+  .then(() => app.listen(port))
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });

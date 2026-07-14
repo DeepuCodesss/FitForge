@@ -1,7 +1,22 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dumbbell, ArrowRight } from "lucide-react";
+import { healthCheck } from "../lib/api";
+import { Badge } from "../components/UI";
 
 export default function Landing() {
+  const [health, setHealth] = useState("checking");
+
+  useEffect(() => {
+    let alive = true;
+    healthCheck()
+      .then(() => alive && setHealth("connected"))
+      .catch(() => alive && setHealth("offline"));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: "var(--color-bg)" }}>
       <div
@@ -40,6 +55,11 @@ export default function Landing() {
         >
           Complete gym management system
         </p>
+        <div className="mb-6">
+          <Badge tone={health === "connected" ? "accent" : "default"}>
+            Backend {health === "checking" ? "checking" : health}
+          </Badge>
+        </div>
         <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight">
           Forge <span style={{ color: "var(--color-accent)" }}>stronger</span>
           <br />

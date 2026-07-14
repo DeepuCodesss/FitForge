@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dumbbell } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { Button, Input } from "../components/UI";
+import { Button, Input, Badge } from "../components/UI";
+import { healthCheck } from "../lib/api";
 
 export default function AdminLogin() {
   const { adminLogin } = useAuth();
@@ -10,6 +11,17 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("admin@fitforge.com");
   const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
+  const [health, setHealth] = useState("checking");
+
+  useEffect(() => {
+    let alive = true;
+    healthCheck()
+      .then(() => alive && setHealth("connected"))
+      .catch(() => alive && setHealth("offline"));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const submit = (e) => {
     e.preventDefault();
@@ -41,8 +53,13 @@ export default function AdminLogin() {
             <Button type="submit" className="w-full mt-2">Log In</Button>
           </form>
           <p className="text-xs text-center mt-5" style={{ color: "var(--color-muted)" }}>
-            Demo admin credentials are pre-filled — just hit Log In.
+            Demo admin credentials are pre-filled - just hit Log In.
           </p>
+          <div className="mt-4 flex justify-center">
+            <Badge tone={health === "connected" ? "accent" : "default"}>
+              Backend {health === "checking" ? "checking" : health}
+            </Badge>
+          </div>
         </div>
       </div>
     </div>
