@@ -7,19 +7,30 @@ import { listMembers, getDB, todayISO } from "../../lib/store";
 export default function AdminDashboard() {
   const [members, setMembers] = useState([]);
   const [db, setDB] = useState({ fees: [], attendance: [] });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
     (async () => {
       const [loadedMembers, loadedDB] = await Promise.all([listMembers(), getDB()]);
       if (!alive) return;
-      setMembers(loadedMembers);
-      setDB(loadedDB);
+      setMembers(Array.isArray(loadedMembers) ? loadedMembers : []);
+      setDB(loadedDB && typeof loadedDB === "object" ? loadedDB : { fees: [], attendance: [] });
+      setLoading(false);
     })();
     return () => {
       alive = false;
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div>
+        <PageHeader title="Overview" subtitle="Gym-wide snapshot" />
+        <Panel>Loading admin dashboard...</Panel>
+      </div>
+    );
+  }
 
   const active = members.filter((m) => m.status === "active").length;
   const revenue = db.fees.filter((f) => f.status === "paid").reduce((s, f) => s + f.amount, 0);
