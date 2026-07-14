@@ -79,17 +79,8 @@ function AppRoutes() {
         <Route index element={<AdminDashboard />} />
         <Route path="members" element={<AdminMembers />} />
         <Route path="members/:id" element={<AdminMemberDetail />} />
-        <Route path="trainers" element={<AdminModule />} />
-        <Route path="diet-plans" element={<AdminModule />} />
-        <Route path="workout-plans" element={<AdminModule />} />
-        <Route path="attendance" element={<AdminModule />} />
-        <Route path="progress-tracking" element={<AdminModule />} />
+        <Route path=":section" element={<AdminModule />} />
         <Route path="feedback" element={<AdminFeedback />} />
-        <Route path="fees-management" element={<AdminModule />} />
-        <Route path="notifications" element={<AdminModule />} />
-        <Route path="reports" element={<AdminModule />} />
-        <Route path="analytics" element={<AdminModule />} />
-        <Route path="settings" element={<AdminModule />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

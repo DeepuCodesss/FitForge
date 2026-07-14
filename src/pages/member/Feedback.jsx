@@ -9,9 +9,8 @@ export default function Feedback() {
   const [message, setMessage] = useState("");
   const [items, setItems] = useState([]);
 
-  if (!member) return null;
-
   useEffect(() => {
+    if (!member) return;
     let alive = true;
     (async () => {
       const data = await getFeedback(member.id);
@@ -20,7 +19,9 @@ export default function Feedback() {
     return () => {
       alive = false;
     };
-  }, [member.id]);
+  }, [member]);
+
+  if (!member) return null;
 
   const submit = (e) => {
     e.preventDefault();

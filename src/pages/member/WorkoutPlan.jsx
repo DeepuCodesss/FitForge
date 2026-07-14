@@ -6,9 +6,9 @@ import { getWorkoutPlan } from "../../lib/store";
 export default function WorkoutPlan() {
   const { member } = useAuth();
   const [plan, setPlan] = useState(null);
-  if (!member) return null;
 
   useEffect(() => {
+    if (!member) return;
     let alive = true;
     (async () => {
       const data = await getWorkoutPlan(member.id);
@@ -17,7 +17,9 @@ export default function WorkoutPlan() {
     return () => {
       alive = false;
     };
-  }, [member.id]);
+  }, [member]);
+
+  if (!member) return null;
 
   return (
     <div>

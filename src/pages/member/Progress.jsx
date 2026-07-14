@@ -12,9 +12,8 @@ export default function Progress() {
   const [note, setNote] = useState("");
   const [entries, setEntries] = useState([]);
 
-  if (!member) return null;
-
   useEffect(() => {
+    if (!member) return;
     let alive = true;
     (async () => {
       const data = await getProgress(member.id);
@@ -23,7 +22,9 @@ export default function Progress() {
     return () => {
       alive = false;
     };
-  }, [member.id, showForm]);
+  }, [member, showForm]);
+
+  if (!member) return null;
 
   const submit = (e) => {
     e.preventDefault();

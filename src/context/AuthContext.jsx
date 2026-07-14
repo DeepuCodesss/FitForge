@@ -53,7 +53,23 @@ export function AuthProvider({ children }) {
     setLoading(false);
   };
 
-  return <AuthContext.Provider value={{ session, member, loading, memberLogin, memberSignup, adminLogin, logout, refreshSession }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        session,
+        member,
+        loading,
+        memberLogin,
+        memberSignup,
+        adminLogin,
+        logout,
+        refreshSession,
+        refreshMember: refreshSession,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

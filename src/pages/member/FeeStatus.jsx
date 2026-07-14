@@ -7,9 +7,9 @@ export default function FeeStatus() {
   const { member } = useAuth();
   const [fees, setFees] = useState([]);
   const [summary, setSummary] = useState({ pending: 0, paid: 0 });
-  if (!member) return null;
 
   useEffect(() => {
+    if (!member) return;
     let alive = true;
     (async () => {
       const [loadedFees, loadedSummary] = await Promise.all([
@@ -23,7 +23,9 @@ export default function FeeStatus() {
     return () => {
       alive = false;
     };
-  }, [member.id]);
+  }, [member]);
+
+  if (!member) return null;
   const { pending, paid } = summary;
 
   return (

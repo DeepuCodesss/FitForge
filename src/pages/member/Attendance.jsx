@@ -8,9 +8,9 @@ export default function Attendance() {
   const [, setTick] = useState(0);
   const [records, setRecords] = useState([]);
   const [days, setDays] = useState(0);
-  if (!member) return null;
 
   useEffect(() => {
+    if (!member) return;
     let alive = true;
     (async () => {
       const [loadedRecords, loadedDays] = await Promise.all([
@@ -24,7 +24,9 @@ export default function Attendance() {
     return () => {
       alive = false;
     };
-  }, [member.id, setTick]);
+  }, [member]);
+
+  if (!member) return null;
 
   const markedToday = records.some((r) => r.date === todayISO());
 

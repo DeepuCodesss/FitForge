@@ -7,9 +7,9 @@ export default function Notifications() {
   const { member } = useAuth();
   const [, setTick] = useState(0);
   const [notifications, setNotifications] = useState([]);
-  if (!member) return null;
 
   useEffect(() => {
+    if (!member) return;
     let alive = true;
     (async () => {
       const data = await getNotifications(member.id);
@@ -18,7 +18,9 @@ export default function Notifications() {
     return () => {
       alive = false;
     };
-  }, [member.id]);
+  }, [member]);
+
+  if (!member) return null;
 
   const read = (id) => {
     markNotificationRead(member.id, id);
