@@ -1,22 +1,7 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dumbbell, ArrowRight } from "lucide-react";
-import { API_URL, healthCheck } from "../lib/api";
-import { Badge } from "../components/UI";
 
 export default function Landing() {
-  const [health, setHealth] = useState({ status: "checking", error: "" });
-
-  useEffect(() => {
-    let alive = true;
-    healthCheck()
-      .then(() => alive && setHealth({ status: "connected", error: "" }))
-      .catch((err) => alive && setHealth({ status: "offline", error: err.message }));
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: "var(--color-bg)" }}>
       <div
@@ -55,19 +40,6 @@ export default function Landing() {
         >
           Complete gym management system
         </p>
-        <div className="mb-6">
-          <Badge tone={health.status === "connected" ? "accent" : "default"}>
-            Backend {health.status === "checking" ? "checking" : health.status}
-          </Badge>
-          <p className="mt-2 text-sm" style={{ color: "var(--color-muted)" }}>
-            API URL: {API_URL || "not set"}
-          </p>
-          {health.error && (
-            <p className="mt-1 text-sm" style={{ color: "#ff8a80" }}>
-              {health.error}
-            </p>
-          )}
-        </div>
         <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight">
           Forge <span style={{ color: "var(--color-accent)" }}>stronger</span>
           <br />

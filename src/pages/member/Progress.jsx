@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageHeader, Panel, EmptyState, Button, Input } from "../../components/UI";
 import { getProgress, addProgress, updateMember } from "../../lib/store";
@@ -10,16 +10,30 @@ export default function Progress() {
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
   const [note, setNote] = useState("");
+  const [entries, setEntries] = useState([]);
 
   if (!member) return null;
-  const entries = getProgress(member.id);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const data = await getProgress(member.id);
+      if (alive) setEntries(Array.isArray(data) ? data : []);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [member.id, showForm]);
 
   const submit = (e) => {
     e.preventDefault();
     if (!weight) return;
-    addProgress(member.id, { weight: Number(weight), bodyFat: bodyFat ? Number(bodyFat) : null, note });
-    updateMember(member.id, { currentWeight: weight, ...(bodyFat ? { bodyFat } : {}) });
-    refreshMember();
+    (async () => {
+      const item = await addProgress(member.id, { weight: Number(weight), bodyFat: bodyFat ? Number(bodyFat) : null, note });
+      await updateMember(member.id, { currentWeight: weight, ...(bodyFat ? { bodyFat } : {}) });
+      await refreshMember();
+      setEntries((current) => [item, ...current]);
+    })();
     setWeight("");
     setBodyFat("");
     setNote("");

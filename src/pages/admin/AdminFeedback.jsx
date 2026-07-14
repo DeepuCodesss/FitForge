@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PageHeader, Panel, EmptyState, Textarea, Button } from "../../components/UI";
-import { allFeedback, respondFeedback, getMember } from "../../lib/store";
+import { allFeedback, respondFeedback, listMembers } from "../../lib/store";
 
 export default function AdminFeedback() {
   const [, setTick] = useState(0);
   const [drafts, setDrafts] = useState({});
   const [items, setItems] = useState([]);
+  const [memberNames, setMemberNames] = useState({});
 
   useEffect(() => {
     let alive = true;
     (async () => {
-      const data = await allFeedback();
-      if (alive) setItems(Array.isArray(data) ? data : []);
+      const [feedbackData, membersData] = await Promise.all([allFeedback(), listMembers()]);
+      if (!alive) return;
+      setItems(Array.isArray(feedbackData) ? feedbackData : []);
+      setMemberNames(
+        Object.fromEntries((Array.isArray(membersData) ? membersData : []).map((m) => [m.id, m.name]))
+      );
     })();
     return () => {
       alive = false;
@@ -36,12 +41,11 @@ export default function AdminFeedback() {
       ) : (
         <div className="flex flex-col gap-4">
           {items.map((f) => {
-            const member = getMember(f.memberId);
             return (
               <Panel key={f.id}>
                 <div className="flex items-center justify-between mb-2">
                   <Link to={`/admin/members/${f.memberId}`} className="font-semibold hover:opacity-80">
-                    {member?.name || "Unknown member"}
+                    {memberNames[f.memberId] || "Unknown member"}
                   </Link>
                   <span className="mono text-xs" style={{ color: "var(--color-muted)" }}>{f.date}</span>
                 </div>

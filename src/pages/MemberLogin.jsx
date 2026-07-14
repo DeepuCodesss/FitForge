@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dumbbell } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { Button, Input, Badge } from "../components/UI";
-import { healthCheck } from "../lib/api";
+import { Button, Input } from "../components/UI";
 
 export default function MemberLogin() {
   const { memberLogin } = useAuth();
@@ -11,18 +10,6 @@ export default function MemberLogin() {
   const [email, setEmail] = useState("deeepak@gmail.com");
   const [password, setPassword] = useState("demo1234");
   const [error, setError] = useState("");
-  const [health, setHealth] = useState("checking");
-
-  useEffect(() => {
-    let alive = true;
-    healthCheck()
-      .then(() => alive && setHealth("connected"))
-      .catch(() => alive && setHealth("offline"));
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   const submit = (e) => {
     e.preventDefault();
     Promise.resolve(memberLogin(email, password))
@@ -62,14 +49,6 @@ export default function MemberLogin() {
               Create an account
             </Link>
           </p>
-          <p className="text-xs text-center mt-4" style={{ color: "var(--color-muted)" }}>
-            Demo login is pre-filled - just hit Log In.
-          </p>
-          <div className="mt-4 flex justify-center">
-            <Badge tone={health === "connected" ? "accent" : "default"}>
-              Backend {health === "checking" ? "checking" : health}
-            </Badge>
-          </div>
         </div>
       </div>
     </div>
